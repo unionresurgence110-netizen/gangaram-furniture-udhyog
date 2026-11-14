@@ -67,7 +67,17 @@ router.get('/public/products',wrap(async(req,res)=>{
  WHERE ${w.join(' AND ')}
  ORDER BY p.featured DESC, ${order} LIMIT 250`,vals);
 
- res.json({products:r.rows});
+ const products=r.rows.map(product=>{
+  const visibility=product.details_visibility||{};
+  if(visibility.description===false){product.description='';product.description_ne='';}
+  if(visibility.price===false)product.price=null;
+  if(visibility.woodType===false)product.wood_type='';
+  if(visibility.finish===false)product.finish='';
+  if(visibility.dimensions===false)product.dimensions='';
+  if(visibility.customDesign===false)product.custom_design=false;
+  return product;
+ });
+ res.json({products});
 }));
 
 // Public categories - customer storefront
@@ -139,6 +149,17 @@ router.post('/auth/owner-login',wrap(async(req,res)=>{
 }));
 
 // Public customer registration is disabled for this showcase website.
+router.post('/owner/change-password',...owner,wrap(async(req,res)=>{
+ const currentPassword=String(req.body.currentPassword||'');
+ const newPassword=String(req.body.newPassword||'');
+ if(newPassword.length<10)return res.status(400).json({error:'New password must be at least 10 characters.'});
+ const r=await query('SELECT password_hash FROM users WHERE id=$1 AND role=\'admin\' AND is_active=TRUE',[req.user.id]);
+ if(!r.rowCount||!await bcrypt.compare(currentPassword,r.rows[0].password_hash))return res.status(401).json({error:'Current password is incorrect.'});
+ const hash=await bcrypt.hash(newPassword,12);
+ await query('UPDATE users SET password_hash=$2,updated_at=NOW() WHERE id=$1',[req.user.id,hash]);
+ res.json({updated:true});
+}));
+
 router.post('/auth/register',(req,res)=>res.status(404).json({error:'Registration is disabled.'}));
 
 router.post('/auth/login',(req,res)=>res.status(404).json({error:'Customer sign-in is disabled. Use the private owner login.'}));
@@ -355,18 +376,18 @@ router.delete('/owner/reviews/:id',...owner,wrap(async(req,res)=>{
 
 // Product list, create, update and hide
 router.get('/owner/products',...owner,wrap(async(req,res)=>{
- const r=await query('SELECT p.*,c.name AS category_name FROM products p LEFT JOIN categories c ON c.id=p.category_id WHERE p.is_hidden=FALSE ORDER BY p.created_at DESC');
+ const r=await query('SELECT p.*,c.name AS category_name FROM products p LEFT JOIN categories c ON c.id=p.category_id ORDER BY p.created_at DESC');
  res.json({products:r.rows});
 }));
 
 router.post('/owner/products',...owner,wrap(async(req,res)=>{
- const {name,description='',nameNe='',descriptionNe='',price=null,categoryId,woodType='',finish='',dimensions='',customDesign=false,imageUrl='',imageUrls=[]}=req.body;
+ const {name,description='',nameNe='',descriptionNe='',price=null,categoryId,woodType='',finish='',dimensions='',customDesign=false,imageUrl='',imageUrls=[],detailsVisibility={},isHidden=false}=req.body;
  const cleanPrice=price===null||price===''||price===undefined?null:Number(price);
  if(!String(name||'').trim()||(cleanPrice!==null&&(!Number.isFinite(cleanPrice)||cleanPrice<0))){
   return res.status(400).json({error:'Check the furniture name and optional price.'});
  }
 
- const r=await query('INSERT INTO products(name,description,name_ne,description_ne,price,category_id,wood_type,finish,dimensions,custom_design,image_url,image_urls,featured) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING *',[name.trim(),description,nameNe,descriptionNe,cleanPrice,categoryId||null,woodType,finish,dimensions,!!customDesign,imageUrl||null,JSON.stringify(Array.isArray(imageUrls)?imageUrls:[]),!!req.body.featured]);
+ const r=await query('INSERT INTO products(name,description,name_ne,description_ne,price,category_id,wood_type,finish,dimensions,custom_design,image_url,image_urls,featured,details_visibility,is_hidden) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14::jsonb,$15) RETURNING *',[name.trim(),description,nameNe,descriptionNe,cleanPrice,categoryId||null,woodType,finish,dimensions,!!customDesign,imageUrl||null,JSON.stringify(Array.isArray(imageUrls)?imageUrls:[]),!!req.body.featured,JSON.stringify(detailsVisibility||{}),!!isHidden]);
 
  res.status(201).json({product:r.rows[0]});
 }));
@@ -382,7 +403,7 @@ router.patch('/owner/products/:id',...owner,wrap(async(req,res)=>{
   isHidden:'is_hidden',
   isAvailable:'is_available',
   featured:'featured',
-  nameNe:'name_ne',descriptionNe:'description_ne',woodType:'wood_type',finish:'finish',dimensions:'dimensions',customDesign:'custom_design',imageUrl:'image_url',imageUrls:'image_urls'
+  nameNe:'name_ne',descriptionNe:'description_ne',woodType:'wood_type',finish:'finish',dimensions:'dimensions',customDesign:'custom_design',imageUrl:'image_url',imageUrls:'image_urls',detailsVisibility:'details_visibility'
  };
 
  const sets=[],vals=[];
@@ -391,9 +412,9 @@ router.patch('/owner/products/:id',...owner,wrap(async(req,res)=>{
   if(b[k]!==undefined){
    let value=b[k];
    if(k==='price'&&(value===''||value===null))value=null;
-   if(k==='imageUrls'&&Array.isArray(value))value=JSON.stringify(value);
+   if((k==='imageUrls'||k==='detailsVisibility')&&value&&typeof value==='object')value=JSON.stringify(value);
    vals.push(value);
-   sets.push(`${col}=$${vals.length}`);
+   sets.push(`${col}=${k==='imageUrls'||k==='detailsVisibility'?`$${vals.length}::jsonb`:`$${vals.length}`}`);
   }
  }
 
