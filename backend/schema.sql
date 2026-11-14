@@ -133,7 +133,14 @@ CREATE INDEX IF NOT EXISTS idx_reservations_status ON reservations(status,create
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id,is_read,created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_suggestions_public ON suggestions(public_status,created_at DESC);
 
-INSERT INTO categories(name,icon,sort_order) VALUES
- ('Pen & Pencils','pencil',1),('School Kit','backpack',2),('Kids Fun','toy-brick',3),
- ('Art','palette',4),('Sports','trophy',5),('Decorative','flower-2',6)
+INSERT INTO categories(name, icon, sort_order) VALUES
+ ('Beds', 'bed', 1),
+ ('Doors', 'door-open', 2),
+ ('Windows', 'app-window', 3),
+ ('Wardrobes', 'cabinet', 4),
+ ('Tables', 'table', 5),
+ ('Chairs', 'armchair', 6),
+ ('Sofa Sets', 'sofa', 7),
+ ('Wooden Carving', 'hammer', 8),
+ ('Custom Furniture', 'package', 9)
 ON CONFLICT(name) DO NOTHING;
