@@ -1,4 +1,5 @@
--- Gangaram Furniture Udhyog showcase conversion
+-- Gangaram Furniture Udhyog showcase conversion.
+-- Run once after the original schema and migrations 002 + 003.
 ALTER TABLE products ALTER COLUMN price DROP NOT NULL;
 ALTER TABLE products ALTER COLUMN price DROP DEFAULT;
 ALTER TABLE products ADD COLUMN IF NOT EXISTS name_ne VARCHAR(180) NOT NULL DEFAULT '';
@@ -18,28 +19,32 @@ CREATE TABLE IF NOT EXISTS gallery_items (
  sort_order INT NOT NULL DEFAULT 0,
  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
--- Keep legacy records in the database but prevent old stationery products/categories from showing.
-UPDATE products SET is_hidden=TRUE WHERE TRUE;
+-- Hide only products assigned to the known legacy stationery categories.
+-- This is safe to rerun and does not hide newly added furniture.
+UPDATE products p SET is_hidden=TRUE
+FROM categories c
+WHERE p.category_id=c.id
+ AND c.name IN ('Pen & Pencils','School Kit','Kids Fun','Art','Sports','Decorative');
+-- Deactivate old stationery categories and create/activate the furniture categories by name.
 UPDATE categories SET is_active=FALSE;
-UPDATE categories SET name='Beds',name_ne='पलङ',sort_order=1,is_active=TRUE WHERE id=(SELECT id FROM categories ORDER BY sort_order,id OFFSET 0 LIMIT 1);
-UPDATE categories SET name='Tables',name_ne='टेबल',sort_order=2,is_active=TRUE WHERE id=(SELECT id FROM categories ORDER BY sort_order,id OFFSET 1 LIMIT 1);
-UPDATE categories SET name='Chairs',name_ne='कुर्सी',sort_order=3,is_active=TRUE WHERE id=(SELECT id FROM categories ORDER BY sort_order,id OFFSET 2 LIMIT 1);
-UPDATE categories SET name='Doors & Windows',name_ne='ढोका र झ्याल',sort_order=4,is_active=TRUE WHERE id=(SELECT id FROM categories ORDER BY sort_order,id OFFSET 3 LIMIT 1);
-UPDATE categories SET name='Wardrobes',name_ne='दराज',sort_order=5,is_active=TRUE WHERE id=(SELECT id FROM categories ORDER BY sort_order,id OFFSET 4 LIMIT 1);
-UPDATE categories SET name='Wood Carving',name_ne='काठको नक्काशी',sort_order=6,is_active=TRUE WHERE id=(SELECT id FROM categories ORDER BY sort_order,id OFFSET 5 LIMIT 1);
-INSERT INTO categories(name,name_ne,sort_order) VALUES
- ('Sofa Sets','सोफा सेट',7),('Custom Furniture','अर्डरअनुसारका फर्निचर',8),('Wood Mill','काठ मिल',9)
-ON CONFLICT(name) DO NOTHING;
+INSERT INTO categories(name,name_ne,icon,sort_order,is_active) VALUES
+ ('Beds','पलङ','bed',1,TRUE),
+ ('Doors','ढोका','door-open',2,TRUE),
+ ('Windows','झ्याल','app-window',3,TRUE),
+ ('Wardrobes','दराज','cabinet',4,TRUE),
+ ('Tables','टेबल','table',5,TRUE),
+ ('Chairs','कुर्सी','armchair',6,TRUE),
+ ('Sofa Sets','सोफा सेट','sofa',7,TRUE),
+ ('Wooden Carving','काठको नक्काशी','hammer',8,TRUE),
+ ('Custom Furniture','अर्डरअनुसारका फर्निचर','package',9,TRUE)
+ON CONFLICT(name) DO UPDATE SET name_ne=EXCLUDED.name_ne,icon=EXCLUDED.icon,sort_order=EXCLUDED.sort_order,is_active=TRUE;
+-- Seed defaults without overwriting details entered later in the dashboard.
 INSERT INTO shop_settings(key,value) VALUES
  ('name','"Gangaram Furniture Udhyog"'::jsonb),
  ('suffix','"Furniture & Wood Mill"'::jsonb),
  ('motto','"Crafted with care. Built to last."'::jsonb),
- ('description','"Furniture, custom woodwork, carving and wood mill services."'::jsonb),
- ('phone','""'::jsonb),
- ('email','""'::jsonb),
- ('address','""'::jsonb),
- ('bannerImage','""'::jsonb),
- ('aboutImage','""'::jsonb),
- ('millDescription','"Wood cutting and timber processing services."'::jsonb),
- ('socials','{}'::jsonb)
-ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value,updated_at=NOW();
+ ('description','""'::jsonb),
+ ('phone','""'::jsonb),('email','""'::jsonb),('address','""'::jsonb),
+ ('bannerImage','""'::jsonb),('aboutImage','""'::jsonb),('millImage','""'::jsonb),
+ ('millDescription','""'::jsonb),('socials','{}'::jsonb)
+ON CONFLICT(key) DO NOTHING;
