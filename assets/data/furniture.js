@@ -12,7 +12,7 @@ window.MANUAL_FURNITURE = [
     nameNe: 'हातले कुँदिएको काठको पलङ',
     description: 'Beautiful handcrafted wooden bed.',
     descriptionNe: 'सुन्दर हातले बनाइएको काठको पलङ।',
-    image: '/assets/images/furniture/carved-bed.webp',
+    image: '/assets/images/furniture/carved-bed.webp.jpg',
     category: 'Beds',
     price: null,
     woodType: 'Sal Wood',
