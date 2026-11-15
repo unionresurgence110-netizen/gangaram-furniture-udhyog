@@ -53,7 +53,21 @@
     $('#theme-toggle')?.addEventListener('click',()=>{theme=theme==='dark'?'light':'dark';localStorage.setItem(THEME,theme);document.documentElement.dataset.theme=theme;const b=$('#theme-toggle');if(b)b.textContent=theme==='dark'?'☀':'☾';});
     $('#menu-toggle')?.addEventListener('click',()=>$('.g-nav')?.classList.toggle('open'));
   }
-  function image(src,alt='',cls='') { return src?`<img class="${cls}" src="${esc(src)}" alt="${esc(alt)}" loading="lazy" decoding="async">`:`<div class="g-image-placeholder ${cls}"><span>G</span><small>Gangaram Furniture Udhyog</small></div>`; }
+   function image(src,alt='',cls='') {
+  let imageSrc = src || '';
+
+  if (imageSrc.startsWith('/assets/')) {
+    const base = location.hostname.endsWith('github.io')
+      ? '/gangaram-furniture-udhyog'
+      : '';
+
+    imageSrc = base + imageSrc;
+  }
+
+  return imageSrc
+    ? `<img class="${cls}" src="${esc(imageSrc)}" alt="${esc(alt)}" loading="lazy" decoding="async">`
+    : `<div class="g-image-placeholder ${cls}"><span>G</span><small>Gangaram Furniture Udhyog</small></div>`;
+   }
   function priceLabel(p){return p.price===null||p.price===undefined||p.price===''?t('Contact for Price','मूल्यका लागि सम्पर्क गर्नुहोस्'):`Rs. ${Number(p.price).toLocaleString('en-IN')}`;}
   function productCard(p){
     const name=language==='ne'&&p.name_ne?p.name_ne:p.name;
