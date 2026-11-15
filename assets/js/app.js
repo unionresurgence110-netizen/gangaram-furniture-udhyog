@@ -53,6 +53,8 @@
     $('#theme-toggle')?.addEventListener('click',()=>{theme=theme==='dark'?'light':'dark';localStorage.setItem(THEME,theme);document.documentElement.dataset.theme=theme;const b=$('#theme-toggle');if(b)b.textContent=theme==='dark'?'☀':'☾';});
     $('#menu-toggle')?.addEventListener('click',()=>$('.g-nav')?.classList.toggle('open'));
   }
+
+  // PART 1 COMPLETE — PART 2 STARTS BELOW
    function image(src,alt='',cls='') {
   let imageSrc = src || '';
 
@@ -68,7 +70,9 @@
     ? `<img class="${cls}" src="${esc(imageSrc)}" alt="${esc(alt)}" loading="lazy" decoding="async">`
     : `<div class="g-image-placeholder ${cls}"><span>G</span><small>Gangaram Furniture Udhyog</small></div>`;
    }
+
   function priceLabel(p){return p.price===null||p.price===undefined||p.price===''?t('Contact for Price','मूल्यका लागि सम्पर्क गर्नुहोस्'):`Rs. ${Number(p.price).toLocaleString('en-IN')}`;}
+
   function productCard(p){
     const name=language==='ne'&&p.name_ne?p.name_ne:p.name;
     const desc=language==='ne'&&p.description_ne?p.description_ne:p.description;
@@ -81,64 +85,150 @@
     if(vis.customDesign&&p.custom_design)meta.push(`<span>${t('Custom design available','अनुकूलित डिजाइन उपलब्ध')}</span>`);
     return `<article class="g-furniture-card"><a class="g-card-image" href="#furniture-${esc(p.id)}">${image(img,name)}${p.featured?`<span class="g-featured">${t('Featured','विशेष')}</span>`:''}</a><div class="g-card-body"><div class="g-card-kicker">${esc(p.category_name||p.category||t('Handcrafted Furniture','हस्तनिर्मित फर्निचर'))}</div><h3>${esc(name)}</h3>${vis.description&&desc?`<p>${esc(desc)}</p>`:''}<div class="g-card-meta">${meta.join('')}</div><div class="g-card-bottom">${vis.price?`<strong>${priceLabel(p)}</strong>`:''}<a class="g-call-btn" href="${settings.phone?'tel:'+esc(settings.phone.replace(/[^+\\d]/g,'')):'#contact'}">${icon('phone')} ${t('Call to Enquire','सोधपुछका लागि फोन')}</a></div></div></article>`;
   }
+
   function hero(){const bg=settings.bannerImage?`style="background-image:linear-gradient(90deg,rgba(25,17,12,.88),rgba(25,17,12,.24)),url('${esc(settings.bannerImage)}')"`:'';return `<section class="g-hero" ${bg}><div class="g-hero-inner"><span class="g-eyebrow">${t('CRAFT • QUALITY • TRUST','सीप • गुणस्तर • विश्वास')}</span><h1>${t('Furniture made with','माया र सीपले बनाइएका')}<em>${t('care & craftsmanship.','फर्निचर।')}</em></h1><p>${esc(settings.motto)}</p><div class="g-hero-actions"><a class="g-btn g-btn-gold" href="${link('pages/products.html')}">${t('Explore Furniture','फर्निचर हेर्नुहोस्')} ${icon('arrow')}</a><a class="g-btn g-btn-outline" href="${link('pages/mill.html')}">${t('Wood Mill Services','काठ मिल सेवा')}</a></div></div><div class="g-hero-seal">${icon('craft')}<span>${t('Made with care','मायाले बनाइएको')}</span></div></section>`;}
+
   function sectionHead(eyebrow,title,sub=''){return `<div class="g-section-head"><span class="g-eyebrow">${eyebrow}</span><h2>${title}</h2>${sub?`<p>${sub}</p>`:''}</div>`;}
-  function home(){const featured=products.filter(p=>p.featured).slice(0,4);const picks=(featured.length?featured:products).slice(0,4);const cats=categories.slice(0,6);const recent=gallery.slice(0,3);shell(`${hero()}<section class="g-intro g-wrap"><div>${sectionHead(t('A FAMILY CRAFT','हाम्रो पारिवारिक सीप'),t('More than furniture. A tradition of making.','फर्निचरभन्दा बढी — पुस्तौँको सीप।'),settings.description)}<a class="g-text-link" href="${link('pages/about.html')}">${t('Discover our story','हाम्रो कथा जान्नुहोस्')} ${icon('arrow')}</a></div><div class="g-intro-note"><span>“</span><p>${t('From carefully selected wood to thoughtful finishing, every piece is made to feel at home for years.','छानिएको काठदेखि अन्तिम फिनिसिङसम्म, हरेक सामान वर्षौँसम्म टिक्ने गरी बनाइन्छ।')}</p></div></section><section class="g-section g-wrap">${sectionHead(t('OUR COLLECTION','हाम्रो संग्रह'),t('Furniture & Woodwork','फर्निचर र काठका कामहरू'),t('Explore handcrafted furniture and custom designs.','हातले बनाइएका फर्निचर र आफूअनुसारका डिजाइन हेर्नुहोस्।'))}<div class="g-product-grid">${picks.length?picks.map(productCard).join(''):`<div class="g-empty">${t('Furniture photographs will appear here soon.','फर्निचरका तस्बिरहरू चाँडै यहाँ देखिनेछन्।')}</div>`}</div><div class="g-center"><a class="g-btn g-btn-dark" href="${link('pages/products.html')}">${t('View All Furniture','सबै फर्निचर हेर्नुहोस्')} ${icon('arrow')}</a></div></section><section class="g-category-band"><div class="g-wrap">${sectionHead(t('MADE FOR YOUR SPACE','तपाईंको घरका लागि'),t('Explore by category','श्रेणीअनुसार हेर्नुहोस्'))}<div class="g-category-grid">${cats.map(c=>`<a href="${link('pages/products.html')}?category=${encodeURIComponent(c.name)}" class="g-category"><span>${icon('wood')}</span><strong>${esc(language==='ne'&&c.name_ne?c.name_ne:c.name)}</strong><small>${t('Explore collection','संग्रह हेर्नुहोस्')} ↗</small></a>`).join('')||`<a class="g-category" href="${link('pages/products.html')}"><span>▤</span><strong>${t('Furniture','फर्निचर')}</strong></a>`}</div></div></section><section class="g-mill-promo g-wrap"><div class="g-mill-photo">${image('https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=1200&q=82','Woodworking tools and timber')}</div><div><span class="g-eyebrow">${t('OUR WOOD MILL','हाम्रो काठ मिल')}</span><h2>${t('From raw timber to ready-to-use wood.','काँचो काठदेखि प्रयोगयोग्य काठसम्म।')}</h2><p>${esc(settings.millDescription||t('Wood cutting and timber processing services.','काठ चिरान तथा प्रशोधन सेवा।'))}</p><a class="g-btn g-btn-dark" href="${link('pages/mill.html')}">${t('Discover Wood Mill','काठ मिलबारे जान्नुहोस्')} ${icon('arrow')}</a></div></section>${recent.length?`<section class="g-section g-wrap">${sectionHead(t('RECENT WORK','हालका कामहरू'),t('Crafted by our hands','हाम्रा हातले बनाइएका कामहरू'))}<div class="g-gallery-grid">${recent.map(g=>`<a class="g-gallery-tile" href="${link('pages/gallery.html')}">${image(g.image_url,g.title)}<span>${esc(g.title)}</span></a>`).join('')}</div><div class="g-center"><a class="g-text-link" href="${link('pages/gallery.html')}">${t('See our gallery','ग्यालरी हेर्नुहोस्')} ${icon('arrow')}</a></div></section>`:''}<section class="g-announcement-strip g-wrap"><div><span class="g-eyebrow">${t('FROM OUR WORKSHOP','हाम्रो वर्कशपबाट')}</span><h2>${t('Business announcements','व्यवसायका सूचना')}</h2></div><div>${notices.slice(0,2).map(n=>`<article><strong>${esc(n.title)}</strong><p>${esc(n.body)}</p></article>`).join('')||`<p>${t('Updates and notices will be shared here.','नयाँ सूचना यहाँ राखिनेछ।')}</p>`}<a class="g-text-link" href="${link('pages/announcements.html')}">${t('All announcements','सबै सूचना')} ${icon('arrow')}</a></div></section><section class="g-contact-cta"><span class="g-eyebrow">${t('HAVE A DESIGN IN MIND?','तपाईंको मनमा कुनै डिजाइन छ?')}</span><h2>${t('Let’s make it real.','त्यसलाई वास्तविक बनाऔँ।')}</h2><p>${t('Call us to discuss furniture, custom woodwork or mill services.','फर्निचर, कस्टम काठका काम वा मिल सेवाका लागि फोन गर्नुहोस्।')}</p><a class="g-btn g-btn-gold" href="${settings.phone?'tel:'+esc(settings.phone.replace(/[^+\d]/g,'')):'#contact'}">${icon('phone')} ${t('Call Gangaram Furniture','गंगाराम फर्निचरमा फोन गर्नुहोस्')}</a></section>`,'home');}
-  function furniturePage(){const q=new URLSearchParams(location.search).get('q')?.toLowerCase()||'';const cat=new URLSearchParams(location.search).get('category')||'';let items=products.filter(p=>(!q||`${p.name} ${p.description} ${p.wood_type||''}`.toLowerCase().includes(q))&&(!cat||p.category_name===cat||p.category===cat));shell(`<main class="g-wrap g-page">${sectionHead(t('OUR COLLECTION','हाम्रो संग्रह'),t('Furniture collection','फर्निचर संग्रह'),t('Browse our furniture designs, handcrafted details and custom work.','हाम्रा फर्निचर डिजाइन, नक्काशी र कस्टम कामहरू हेर्नुहोस्।'))}<div class="g-catalog-tools"><label class="g-search"><span>⌕</span><input id="furniture-search" type="search" placeholder="${t('Search furniture...','फर्निचर खोज्नुहोस्...')}" value="${esc(q)}"></label><div class="g-category-dropdown" id="category-dropdown">
-  <button type="button" class="g-category-trigger" id="category-trigger" aria-expanded="false">
-    <span id="category-selected">${esc(categories.find(c=>c.name===cat)?.name || t('All categories','सबै श्रेणी'))}</span>
-    <span class="g-category-arrow">⌄</span>
-  </button>
 
-  <div class="g-category-menu" id="category-menu">
-    <button type="button" data-category="">${t('All categories','सबै श्रेणी')}</button>
-    ${categories.map(c=>`
-      <button type="button" data-category="${esc(c.name)}">
-        ${esc(c.name)}
-      </button>
-    `).join('')}
-  </div></div><div class="g-product-grid g-product-grid-large" id="catalog-grid">${items.map(productCard).join('')||`<div class="g-empty">${t('No furniture found. Please check back soon.','फर्निचर भेटिएन। कृपया पछि फेरि हेर्नुहोस्।')}</div>`}</div></main>`,'furniture');$('#furniture-search')?.addEventListener('input',e=>{const v=e.target.value.toLowerCase();const selected=$('#furniture-category')?.value||'';const filtered=products.filter(p=>(!selected||(p.category_name||p.category)===selected)&&`${p.name||''} ${p.name_ne||''} ${p.description||''} ${p.description_ne||''} ${p.wood_type||p.woodType||''} ${p.finish||''} ${p.dimensions||''}`.toLowerCase().includes(v));$('#catalog-grid').innerHTML=filtered.map(productCard).join('')||`<div class="g-empty">No matching furniture.</div>`;});const dropdown = $('#category-dropdown');
-const trigger = $('#category-trigger');
-const menu = $('#category-menu');
+  function home(){const featured=products.filter(p=>p.featured).slice(0,4);const picks=(featured.length?featured:products).slice(0,4);const cats=categories.slice(0,6);const recent=gallery.slice(0,3);shell(`${hero()}<section class="g-intro g-wrap"><div>${sectionHead(t('A FAMILY CRAFT','हाम्रो पारिवारिक सीप'),t('More than furniture. A tradition of making.','फर्निचरभन्दा बढी — पुस्तौँको सीप।'),settings.description)}<a class="g-text-link" href="${link('pages/about.html')}">${t('Discover our story','हाम्रो कथा जान्नुहोस्')} ${icon('arrow')}</a></div><div class="g-intro-note"><span>“</span><p>${t('From carefully selected wood to thoughtful finishing, every piece is made to feel at home for years.','छानिएको काठदेखि अन्तिम फिनिसिङसम्म, हरेक सामान वर्षौँसम्म टिक्ने गरी बनाइन्छ।')}</p></div></section><section class="g-section g-wrap">${sectionHead(t('OUR COLLECTION','हाम्रो संग्रह'),t('Furniture & Woodwork','फर्निचर र काठका कामहरू'),t('Explore handcrafted furniture and custom designs.','हातले बनाइएका फर्निचर र आफूअनुसारका डिजाइन हेर्नुहोस्।'))}<div class="g-product-grid">${picks.length?picks.map(productCard).join(''):`<div class="g-empty">${t('Furniture photographs will appear here soon.','फर्निचरका तस्बिरहरू चाँडै यहाँ देखिनेछन्।')}</div>`}</div><div class="g-center"><a class="g-btn g-btn-dark" href="${link('pages/products.html')}">${t('View All Furniture','सबै फर्निचर हेर्नुहोस्')} ${icon('arrow')}</a></div></section><section class="g-category-band"><div class="g-wrap">${sectionHead(t('MADE FOR YOUR SPACE','तपाईंको घरका लागि'),t('Explore by category','श्रेणीअनुसार हेर्नुहोस्'))}<div class="g-category-grid">${cats.map(c=>`<a href="${link('pages/products.html')}?category=${encodeURIComponent(c.name)}" class="g-category"><span>${icon('wood')}</span><strong>${esc(language==='ne'&&c.name_ne?c.name_ne:c.name)}</strong><small>${t('Explore collection','संग्रह हेर्नुहोस्')} ↗</small></a>`).join('')||`<a class="g-category" href="${link('pages/products.html')}"><span>▤</span><strong>${t('Furniture','फर्निचर')}</strong></a>`}</div></div></section><section class="g-mill-promo g-wrap"><div class="g-mill-photo">${image('https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=1200&q=82','Woodworking tools and timber')}</div><div><span class="g-eyebrow">${t('OUR WOOD MILL','हाम्रो काठ मिल')}</span><h2>${t('From raw timber to ready-to-use wood.','काँचो काठदेखि प्रयोगयोग्य काठसम्म।')}</h2><p>${esc(settings.millDescription||t('Wood cutting and timber processing services.','काठ चिरान तथा प्रशोधन सेवा।'))}</p><a class="g-btn g-btn-dark" href="${link('pages/mill.html')}">${t('Discover Wood Mill','काठ मिलबारे जान्नुहोस्')} ${icon('arrow')}</a></div></section>${recent.length?`<section class="g-section g-wrap">${sectionHead(t('RECENT WORK','हालका कामहरू'),t('Crafted by our hands','हाम्रा हातले बनाइएका कामहरू'))}<div class="g-gallery-grid">${recent.map(g=>`<a class="g-gallery-tile" href="${link('pages/gallery.html')}">${image(g.image_url,g.title)}<span>${esc(g.title)}</span></a>`).join('')}</div><div class="g-center"><a class="g-text-link" href="${link('pages/gallery.html')}">${t('See our gallery','ग्यालरी हेर्नुहोस्')} ${icon('arrow')}</a></div></section>`:''}<section class="g-announcement-strip g-wrap"><div><span class="g-eyebrow">${t('FROM OUR WORKSHOP','हाम्रो वर्कशपबाट')}</span><h2>${t('Business announcements','व्यवसायका सूचना')}</h2></div><div>${notices.slice(0,2).map(n=>`<article><strong>${esc(n.title)}</strong><p>${esc(n.body)}</p></article>`).join('')||`<p>${t('Updates and notices will be shared here.','नयाँ सूचना यहाँ राखिनेछ।')}</p>`}<a class="g-text-link" href="${link('pages/announcements.html')}">${t('All announcements','सबै सूचना')} ${icon('arrow')}</a></div></section><section class="g-contact-cta"><span class="g-eyebrow">${t('HAVE A DESIGN IN MIND?','तपाईंको मनमा कुनै डिजाइन छ?')}</span><h2>${t('Let’s make it real.','त्यसलाई वास्तविक बनाऔँ।')}</h2><p>${t('Call us to discuss furniture, custom woodwork or mill services.','फर्निचर, कस्टम काठका काम वा मिल सेवाका लागि फोन गर्नुहोस्।')}</p><a class="g-btn g-btn-gold" href="${settings.phone?'tel:'+esc(settings.phone.replace(/[^+\\d]/g,'')):'#contact'}">${icon('phone')} ${t('Call Gangaram Furniture','गंगाराम फर्निचरमा फोन गर्नुहोस्')}</a></section>`,'home');}
 
-trigger?.addEventListener('click', () => {
-  const isOpen = dropdown.classList.toggle('open');
-  trigger.setAttribute('aria-expanded', String(isOpen));
-});
+  // PART 2 COMPLETE — PART 3 STARTS BELOW
+   function furniturePage() {
+    const params = new URLSearchParams(location.search);
+    const q = (params.get('q') || '').toLowerCase();
+    const cat = params.get('category') || '';
 
-menu?.querySelectorAll('button').forEach(button => {
-  button.addEventListener('click', () => {
-    const value = button.dataset.category;
-    const url = new URL(location.href);
+    const items = products.filter(p =>
+      (!q || `${p.name || ''} ${p.description || ''} ${p.wood_type || ''}`.toLowerCase().includes(q)) &&
+      (!cat || p.category_name === cat || p.category === cat)
+    );
 
-    if (value) url.searchParams.set('category', value);
-    else url.searchParams.delete('category');
+    const selectedCategory = categories.find(c => c.name === cat);
+    const selectedLabel = language === 'ne' && selectedCategory?.name_ne
+      ? selectedCategory.name_ne
+      : (selectedCategory?.name || t('All categories', 'सबै श्रेणी'));
 
-    const term = $('#furniture-search')?.value || '';
-    if (term) url.searchParams.set('q', term);
-    else url.searchParams.delete('q');
+    shell(`
+      <main class="g-wrap g-page">
+        ${sectionHead(
+          t('OUR COLLECTION', 'हाम्रो संग्रह'),
+          t('Furniture collection', 'फर्निचर संग्रह'),
+          t('Browse our furniture designs, handcrafted details and custom work.', 'हाम्रा फर्निचर डिजाइन, नक्काशी र कस्टम कामहरू हेर्नुहोस्।')
+        )}
+        <div class="g-catalog-tools">
+          <label class="g-search">
+            <span>⌕</span>
+            <input
+              id="furniture-search"
+              type="search"
+              placeholder="${t('Search furniture...', 'फर्निचर खोज्नुहोस्...')}"
+              value="${esc(q)}"
+            >
+          </label>
 
-    location.href = url;
-  });
-});
+          <div class="g-category-dropdown" id="category-dropdown">
+            <button
+              type="button"
+              class="g-category-trigger"
+              id="category-trigger"
+              aria-expanded="false"
+            >
+              <span id="category-selected">${esc(selectedLabel)}</span>
+              <span class="g-category-arrow">⌄</span>
+            </button>
 
-document.addEventListener('click', event => {
-  if (!dropdown?.contains(event.target)) {
-    dropdown?.classList.remove('open');
-    trigger?.setAttribute('aria-expanded', 'false');
+            <div class="g-category-menu" id="category-menu">
+              <button type="button" data-category="">
+                ${t('All categories', 'सबै श्रेणी')}
+              </button>
+              ${categories.map(c => `
+                <button type="button" data-category="${esc(c.name)}">
+                  ${esc(language === 'ne' && c.name_ne ? c.name_ne : c.name)}
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <div class="g-product-grid g-product-grid-large" id="catalog-grid">
+          ${items.map(productCard).join('') || `
+            <div class="g-empty">
+              ${t('No furniture found. Please check back soon.', 'फर्निचर भेटिएन। कृपया पछि फेरि हेर्नुहोस्।')}
+            </div>
+          `}
+        </div>
+      </main>
+    `, 'furniture');
+
+    $('#furniture-search')?.addEventListener('input', e => {
+      const value = e.target.value.toLowerCase();
+      const selected = new URLSearchParams(location.search).get('category') || '';
+
+      const filtered = products.filter(p =>
+        (!selected || (p.category_name || p.category) === selected) &&
+        `${p.name || ''} ${p.name_ne || ''} ${p.description || ''} ${p.description_ne || ''} ${p.wood_type || p.woodType || ''} ${p.finish || ''} ${p.dimensions || ''}`
+          .toLowerCase()
+          .includes(value)
+      );
+
+      $('#catalog-grid').innerHTML = filtered.map(productCard).join('') || `
+        <div class="g-empty">${t('No matching furniture.', 'मिल्दो फर्निचर भेटिएन।')}</div>
+      `;
+    });
+
+    const dropdown = $('#category-dropdown');
+    const trigger = $('#category-trigger');
+    const menu = $('#category-menu');
+
+    trigger?.addEventListener('click', () => {
+      const isOpen = dropdown.classList.toggle('open');
+      trigger.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    menu?.querySelectorAll('button').forEach(button => {
+      button.addEventListener('click', () => {
+        const value = button.dataset.category;
+        const url = new URL(location.href);
+
+        if (value) url.searchParams.set('category', value);
+        else url.searchParams.delete('category');
+
+        const term = $('#furniture-search')?.value || '';
+        if (term) url.searchParams.set('q', term);
+        else url.searchParams.delete('q');
+
+        location.href = url.toString();
+      });
+    });
+
+    document.addEventListener('click', event => {
+      if (!dropdown?.contains(event.target)) {
+        dropdown?.classList.remove('open');
+        trigger?.setAttribute('aria-expanded', 'false');
+      }
+    });
   }
-});{const u=new URL(location.href);if(e.target.value)u.searchParams.set('category',e.target.value);else u.searchParams.delete('category');const term=$('#furniture-search')?.value||'';if(term)u.searchParams.set('q',term);else u.searchParams.delete('q');location.href=u;});}
-  function galleryPage(){shell(`<main class="g-wrap g-page">${sectionHead(t('OUR CRAFTSMANSHIP','हाम्रो सीप'),t('Our work gallery','हाम्रा कामहरूको ग्यालरी'),t('A selection of furniture, wood carving and workshop projects.','फर्निचर, काठको नक्काशी र वर्कशपका केही कामहरू।'))}<div class="g-gallery-grid g-gallery-grid-page">${gallery.map(g=>`<article class="g-gallery-item">${image(g.image_url,g.title)}<div><h3>${esc(g.title)}</h3><p>${esc(g.description)}</p></div></article>`).join('')||`<div class="g-empty">${t('Project photographs will be added here.','परियोजनाका तस्बिरहरू यहाँ थपिनेछन्।')}</div>`}</div></main>`,'gallery');}
+
+  // PART 3 COMPLETE — PART 4 STARTS BELOW
+   function galleryPage(){shell(`<main class="g-wrap g-page">${sectionHead(t('OUR CRAFTSMANSHIP','हाम्रो सीप'),t('Our work gallery','हाम्रा कामहरूको ग्यालरी'),t('A selection of furniture, wood carving and workshop projects.','फर्निचर, काठको नक्काशी र वर्कशपका केही कामहरू।'))}<div class="g-gallery-grid g-gallery-grid-page">${gallery.map(g=>`<article class="g-gallery-item">${image(g.image_url,g.title)}<div><h3>${esc(g.title)}</h3><p>${esc(g.description)}</p></div></article>`).join('')||`<div class="g-empty">${t('Project photographs will be added here.','परियोजनाका तस्बिरहरू यहाँ थपिनेछन्।')}</div>`}</div></main>`,'gallery');}
+
   function aboutPage(){const intro=settings.description||t('Business introduction will be added by the owner.','व्यवसायको परिचय सञ्चालकले थप्नुहुनेछ।');shell(`<main class="g-wrap g-page"><div class="g-about-layout"><div>${sectionHead(t('ABOUT THE BUSINESS','हाम्रो व्यवसाय'),t('Gangaram Furniture Udhyog','गंगाराम फर्निचर उद्योग'),intro)}<p class="g-long-copy">${esc(intro)}</p></div><div class="g-about-photo">${settings.aboutImage?image(settings.aboutImage,'Business information image'):'<div class="g-image-placeholder"><span>G</span><small>Business image will be added by the owner</small></div>'}</div></div></main>`,'about');}
 
   function millPage(){const info=settings.millDescription||t('Wood Mill service information will be added by the owner. Please contact the business for current details.','काठ मिल सेवाको जानकारी सञ्चालकले थप्नुहुनेछ। हालको जानकारीका लागि व्यवसायमा सम्पर्क गर्नुहोस्।');shell(`<main class="g-wrap g-page"><div class="g-mill-page"><div>${sectionHead(t('WOOD MILL','काठ मिल'),t('Wood Mill Information','काठ मिलको जानकारी'),info)}<p class="g-long-copy">${esc(info)}</p><a class="g-btn g-btn-dark" href="${settings.phone?'tel:'+esc(settings.phone.replace(/[^+\\d]/g,'')):'#contact'}">${icon('phone')} ${t('Call for information','जानकारीका लागि फोन')}</a></div><div class="g-mill-large">${settings.millImage?image(settings.millImage,'Wood Mill business image'):'<div class="g-image-placeholder"><span>G</span><small>Wood Mill image will be added by the owner</small></div>'}</div></div></main>`,'mill');}
 
   function announcementsPage(){shell(`<main class="g-wrap g-page">${sectionHead(t('LATEST FROM US','हाम्रो नयाँ सूचना'),t('Business announcements','व्यवसायका सूचना'))}<div class="g-notices">${notices.map(n=>`<article><small>${new Date(n.created_at).toLocaleDateString()}</small><h3>${esc(n.title)}</h3><p>${esc(n.body)}</p></article>`).join('')||`<div class="g-empty">${t('There are no announcements at the moment.','हाल कुनै सूचना छैन।')}</div>`}</div></main>`);}
+
   function loginPage(){document.body.classList.add('g-admin-body');$('#app').innerHTML=`<main class="g-login-wrap"><a class="g-brand" href="../index.html"><span class="g-brand-mark">G</span><span><strong>Gangaram Furniture Udhyog</strong><small>PRIVATE OWNER ACCESS</small></span></a><form class="g-login-card" id="owner-login"><span class="g-eyebrow">SECURE ACCESS</span><h1>Owner sign in</h1><p>This area is only for the business owner.</p><label>Email address<input type="email" name="email" required autocomplete="username"></label><label>Password<input type="password" name="password" required autocomplete="current-password"></label><button class="g-btn g-btn-dark" type="submit">Sign in to dashboard</button><a href="../index.html" class="g-back-link">← Back to website</a><div id="login-error" role="alert"></div></form></main>`;$('#owner-login').addEventListener('submit',async e=>{e.preventDefault();const b=e.currentTarget.querySelector('button');b.disabled=true;b.textContent='Signing in…';try{const f=new FormData(e.currentTarget);const r=await api('/auth/owner-login',{method:'POST',body:{email:f.get('email'),password:f.get('password')}});localStorage.setItem(TOKEN,r.token);location.href='dashboard.html';}catch(err){$('#login-error').textContent=err.message;b.disabled=false;b.textContent='Sign in to dashboard';}});}
+
   async function uploadImage(file,folder='products'){if(!file) return '';if(!/^image\/(jpeg|png|webp)$/.test(file.type))throw new Error('Use JPG, PNG or WebP images.');if(file.size>12*1024*1024)throw new Error('Please choose an image smaller than 12 MB before compression.');const optimized=await compressImage(file);if(optimized.size>1024*1024)throw new Error('Image is still over 1 MB after compression. Please choose a smaller image.');const fd=new FormData();fd.append('folder',folder);fd.append('image',optimized,file.name.replace(/\.[^.]+$/,'.webp'));const r=await api('/owner/upload',{method:'POST',body:fd});return r.url;}
-  async function compressImage(file){if(file.type==='image/webp'&&file.size<900*1024)return file;const url=URL.createObjectURL(file);try{const img=new Image();img.src=url;await img.decode();const max=1800,scale=Math.min(1,max/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.82));if(!blob)throw new Error('Could not optimize this image.');return new File([blob],file.name.replace(/\.[^.]+$/,'.webp'),{type:'image/webp'});}finally{URL.revokeObjectURL(url);}}
+
+  // PART 4 COMPLETE — PART 5 STARTS BELOW
+    async function compressImage(file){if(file.type==='image/webp'&&file.size<900*1024)return file;const url=URL.createObjectURL(file);try{const img=new Image();img.src=url;await img.decode();const max=1800,scale=Math.min(1,max/Math.max(img.width,img.height));const canvas=document.createElement('canvas');canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/webp',.82));if(!blob)throw new Error('Could not optimize this image.');return new File([blob],file.name.replace(/\.[^.]+$/,'.webp'),{type:'image/webp'});}finally{URL.revokeObjectURL(url);}}
+
   async function dashboard(returnTab='overview'){if(!token()){location.href='login.html';return;}try{const r=await api('/auth/me');owner=r.user;if(owner.role!=='admin')throw new Error('Owner access required.');}catch(e){localStorage.removeItem(TOKEN);location.href='login.html';return;}const [p,c,g,n]=await Promise.all([api('/owner/products'),api('/owner/categories'),api('/owner/gallery'),api('/owner/notices')]);products=p.products||[];categories=c.categories||[];gallery=g.items||[];notices=n.notices||[];renderDashboard(returnTab);}
+
   function renderDashboard(tab){const nav=[['overview','Overview'],['furniture','Furniture'],['categories','Categories'],['gallery','Gallery'],['announcements','Announcements'],['settings','Business settings']];$('#app').innerHTML=`<div class="g-admin-layout"><aside class="g-admin-side"><a class="g-brand" href="../index.html"><span class="g-brand-mark">G</span><span><strong>Gangaram Furniture</strong><small>OWNER PANEL</small></span></a><div class="g-admin-user"><span>OWNER</span><strong>${esc(owner?.name||owner?.email||'Owner')}</strong><small>${esc(owner?.email||'')}</small></div><nav>${nav.map(([id,label])=>`<button class="${tab===id?'active':''}" data-tab="${id}">${label}</button>`).join('')}</nav><a href="../index.html" class="g-side-site">↗ View website</a><button class="g-side-logout" id="logout">Sign out</button></aside><main class="g-admin-main"><header class="g-admin-top"><div><span class="g-eyebrow">BUSINESS MANAGEMENT</span><h1>${nav.find(x=>x[0]===tab)[1]}</h1></div><div class="g-admin-top-actions"><button class="g-theme-toggle" id="admin-theme-toggle" type="button" aria-label="Toggle colour theme">${theme==='dark'?'☀':'☾'}</button><a href="../index.html" class="g-btn g-btn-outline-dark">View website ↗</a></div></header><section id="admin-content">${dashboardContent(tab)}</section></main></div>`;$$('[data-tab]').forEach(b=>b.addEventListener('click',()=>renderDashboard(b.dataset.tab)));$('#admin-theme-toggle')?.addEventListener('click',()=>{theme=theme==='dark'?'light':'dark';localStorage.setItem(THEME,theme);document.documentElement.dataset.theme=theme;const b=$('#admin-theme-toggle');if(b)b.textContent=theme==='dark'?'☀':'☾';});$('#logout').onclick=()=>{localStorage.removeItem(TOKEN);location.href='login.html';};bindDashboard(tab);}
+
   function dashboardContent(tab){if(tab==='overview')return `<div class="g-admin-stats"><article><span>Furniture designs</span><strong>${products.length}</strong></article><article><span>Categories</span><strong>${categories.length}</strong></article><article><span>Gallery projects</span><strong>${gallery.length}</strong></article><article><span>Announcements</span><strong>${notices.length}</strong></article></div><div class="g-admin-welcome"><span class="g-eyebrow">WELCOME BACK</span><h2>Manage your craftsmanship showcase.</h2><p>Add new furniture, update descriptions, publish workshop news and keep your gallery current.</p><button class="g-btn g-btn-dark" data-tab="furniture">Manage furniture →</button></div>`;
     if(tab==='furniture')return `<div class="g-admin-toolbar"><p>Add, edit or hide furniture designs. Uploads are limited to 1 MB and optimized to WebP.</p><button class="g-btn g-btn-dark" id="new-furniture">+ Add furniture</button></div><div class="g-admin-list">${products.filter(p=>!p.manual).map(p=>`<article class="${p.is_hidden?'g-admin-hidden':''}"><img src="${esc(p.image_url||'')}" alt=""><div><strong>${esc(p.name)}</strong><small>${esc(p.category_name||'Uncategorized')} · ${p.price==null?'Contact for Price':'Rs. '+p.price} · ${p.is_hidden?'Hidden':'Public'}</small></div><button data-edit-product="${p.id}">Edit</button><button data-toggle-product="${p.id}" data-next-hidden="${p.is_hidden?'false':'true'}">${p.is_hidden?'Show':'Hide'}</button></article>`).join('')||'<p class="g-empty">No furniture added yet.</p>'}</div><div id="admin-modal"></div>`;
     if(tab==='categories')return `<div class="g-admin-toolbar"><p>Organize furniture into useful categories.</p><form id="category-form" class="g-inline-form"><input name="name" placeholder="Category name" required><input name="nameNe" placeholder="नेपाली नाम"><button class="g-btn g-btn-dark">Add category</button></form></div><div class="g-admin-list">${categories.map(c=>`<article><div><strong>${esc(c.name)}</strong><small>${esc(c.name_ne||'')}</small></div><button class="danger" data-delete-category="${c.id}">Delete</button></article>`).join('')||'<p class="g-empty">No categories yet.</p>'}</div>`;
@@ -147,15 +237,22 @@ document.addEventListener('click', event => {
     if(tab==='settings')return `<form id="settings-form" class="g-admin-form g-settings-form"><h2>Business details</h2><label>Business name<input name="name" value="${esc(settings.name)}"></label><label>Subtitle<input name="suffix" value="${esc(settings.suffix)}"></label><label>Tagline<input name="motto" value="${esc(settings.motto)}"></label><label>Business description<textarea name="description">${esc(settings.description)}</textarea></label><label>Wood mill description<textarea name="millDescription">${esc(settings.millDescription||'')}</textarea></label><label>Wood mill image URL<input name="millImage" value="${esc(settings.millImage||'')}"></label><label>Upload Wood Mill image (max 1 MB)<input id="mill-file" type="file" accept="image/jpeg,image/png,image/webp"></label><label>Phone number<input name="phone" value="${esc(settings.phone)}"></label><label>Email<input name="email" type="email" value="${esc(settings.email)}"></label><label>Address<input name="address" value="${esc(settings.address)}"></label><label>Homepage banner image<input name="bannerImage" value="${esc(settings.bannerImage)}" placeholder="Image URL or upload below"></label><label>Upload banner (max 1 MB)<input id="banner-file" type="file" accept="image/jpeg,image/png,image/webp"></label><label>About image URL<input name="aboutImage" value="${esc(settings.aboutImage)}"></label><label>Upload about image (max 1 MB)<input id="about-file" type="file" accept="image/jpeg,image/png,image/webp"></label><label>Facebook URL<input name="facebook" value="${esc(settings.socials?.facebook||'')}"></label><label>Instagram URL<input name="instagram" value="${esc(settings.socials?.instagram||'')}"></label><button class="g-btn g-btn-dark">Save business settings</button></form><form id="password-form" class="g-admin-form g-password-form"><h2>Change owner password</h2><label>Current password<input name="currentPassword" type="password" autocomplete="current-password" required></label><label>New password<input name="newPassword" type="password" minlength="10" autocomplete="new-password" required></label><label>Confirm new password<input name="confirmPassword" type="password" minlength="10" autocomplete="new-password" required></label><button class="g-btn g-btn-dark">Update password</button></form>`;
     return '';
   }
-  function productModal(product=null){const p=product||{};$('#admin-modal').innerHTML=`<div class="g-modal-backdrop"><form class="g-product-form" id="product-form"><div class="g-modal-head"><h2>${product?'Edit furniture':'Add furniture'}</h2><button type="button" id="close-modal">×</button></div><input type="hidden" name="id" value="${esc(p.id||'')}"><div class="g-form-grid"><label>Furniture name (English)<input name="name" required value="${esc(p.name||'')}"></label><label>Furniture name (Nepali)<input name="nameNe" value="${esc(p.name_ne||'')}"></label><label class="full">Description (English)<textarea name="description" rows="3">${esc(p.description||'')}</textarea></label><label class="full">विवरण (नेपाली)<textarea name="descriptionNe" rows="3">${esc(p.description_ne||'')}</textarea></label><label>Category<select name="categoryId"><option value="">Choose category</option>${categories.map(c=>`<option value="${c.id}" ${p.category_id===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label><label>Price (optional)<input name="price" type="number" min="0" step="0.01" value="${p.price??''}" placeholder="Leave empty for Contact for Price"></label><label>Wood type<input name="woodType" value="${esc(p.wood_type||'')}"></label><label>Finish / polish<input name="finish" value="${esc(p.finish||'')}"></label><label>Dimensions<input name="dimensions" value="${esc(p.dimensions||'')}" placeholder="e.g. 6 ft × 6.5 ft"></label><label>Main image (max 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp"></label><label class="full">Additional image URLs (one per line)<textarea name="imageUrls" rows="2" placeholder="/assets/images/furniture/detail.webp">${esc((p.image_urls||[]).join('\n'))}</textarea></label><label class="g-check full"><input type="checkbox" name="customDesign" ${p.custom_design?'checked':''}> Custom design available</label><label class="g-check full"><input type="checkbox" name="featured" ${p.featured?'checked':''}> Feature on homepage</label><fieldset class="g-visibility full"><legend>Public visibility for individual details</legend>${[['description','Description'],['price','Price'],['woodType','Wood type'],['finish','Finish / polish'],['dimensions','Dimensions'],['customDesign','Custom design availability']].map(([k,label])=>`<label class="g-check"><input type="checkbox" name="show_${k}" ${((p.details_visibility||{})[k]!==false)?'checked':''}> ${label}</label>`).join('')}</fieldset><label class="g-check full"><input type="checkbox" name="isHidden" ${p.is_hidden?'checked':''}> Hide this entire furniture item from the public website</label></div><div class="g-live-preview" id="furniture-preview"><strong>Preview</strong><p>${esc(p.name||'Furniture name')}</p><small>Public details update as you edit this form.</small></div><button class="g-btn g-btn-dark" type="submit">Save furniture</button><p class="g-form-note">Images are compressed to WebP in your browser before upload. Max final size: 1 MB.</p></form></div>`;$('#close-modal').onclick=()=>$('#admin-modal').innerHTML='';
+
+  // PART 5 COMPLETE — PART 6 STARTS BELOW
+    function productModal(product=null){const p=product||{};$('#admin-modal').innerHTML=`<div class="g-modal-backdrop"><form class="g-product-form" id="product-form"><div class="g-modal-head"><h2>${product?'Edit furniture':'Add furniture'}</h2><button type="button" id="close-modal">×</button></div><input type="hidden" name="id" value="${esc(p.id||'')}"><div class="g-form-grid"><label>Furniture name (English)<input name="name" required value="${esc(p.name||'')}"></label><label>Furniture name (Nepali)<input name="nameNe" value="${esc(p.name_ne||'')}"></label><label class="full">Description (English)<textarea name="description" rows="3">${esc(p.description||'')}</textarea></label><label class="full">विवरण (नेपाली)<textarea name="descriptionNe" rows="3">${esc(p.description_ne||'')}</textarea></label><label>Category<select name="categoryId"><option value="">Choose category</option>${categories.map(c=>`<option value="${c.id}" ${p.category_id===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select></label><label>Price (optional)<input name="price" type="number" min="0" step="0.01" value="${p.price??''}" placeholder="Leave empty for Contact for Price"></label><label>Wood type<input name="woodType" value="${esc(p.wood_type||'')}"></label><label>Finish / polish<input name="finish" value="${esc(p.finish||'')}"></label><label>Dimensions<input name="dimensions" value="${esc(p.dimensions||'')} " placeholder="e.g. 6 ft × 6.5 ft"></label><label>Main image (max 1 MB)<input name="image" type="file" accept="image/jpeg,image/png,image/webp"></label><label class="full">Additional image URLs (one per line)<textarea name="imageUrls" rows="2" placeholder="/assets/images/furniture/detail.webp">${esc((p.image_urls||[]).join('\n'))}</textarea></label><label class="g-check full"><input type="checkbox" name="customDesign" ${p.custom_design?'checked':''}> Custom design available</label><label class="g-check full"><input type="checkbox" name="featured" ${p.featured?'checked':''}> Feature on homepage</label><fieldset class="g-visibility full"><legend>Public visibility for individual details</legend>${[['description','Description'],['price','Price'],['woodType','Wood type'],['finish','Finish / polish'],['dimensions','Dimensions'],['customDesign','Custom design availability']].map(([k,label])=>`<label class="g-check"><input type="checkbox" name="show_${k}" ${((p.details_visibility||{})[k]!==false)?'checked':''}> ${label}</label>`).join('')}</fieldset><label class="g-check full"><input type="checkbox" name="isHidden" ${p.is_hidden?'checked':''}> Hide this entire furniture item from the public website</label></div><div class="g-live-preview" id="furniture-preview"><strong>Preview</strong><p>${esc(p.name||'Furniture name')}</p><small>Public details update as you edit this form.</small></div><button class="g-btn g-btn-dark" type="submit">Save furniture</button><p class="g-form-note">Images are compressed to WebP in your browser before upload. Max final size: 1 MB.</p></form></div>`;$('#close-modal').onclick=()=>$('#admin-modal').innerHTML='';
     const preview=$('#furniture-preview');$('#product-form').addEventListener('input',()=>{if(preview){const nm=$('#product-form [name="name"]').value||'Furniture name';preview.querySelector('p').textContent=nm;preview.querySelector('small').textContent='Preview only — save to publish your changes.';}});
     $('#product-form').onsubmit=async e=>{e.preventDefault();const form=e.currentTarget,fd=new FormData(form),id=fd.get('id');const b=form.querySelector('button[type=submit]');b.disabled=true;try{let imageUrl=p.image_url||'';if(fd.get('image')?.size)imageUrl=await uploadImage(fd.get('image'));const imageUrls=String(fd.get('imageUrls')||'').split('\n').map(x=>x.trim()).filter(Boolean);const body={name:fd.get('name'),nameNe:fd.get('nameNe'),description:fd.get('description'),descriptionNe:fd.get('descriptionNe'),categoryId:fd.get('categoryId')||null,price:fd.get('price')||null,woodType:fd.get('woodType'),finish:fd.get('finish'),dimensions:fd.get('dimensions'),customDesign:fd.get('customDesign')==='on',featured:fd.get('featured')==='on',isHidden:fd.get('isHidden')==='on',detailsVisibility:{description:fd.get('show_description')==='on',price:fd.get('show_price')==='on',woodType:fd.get('show_woodType')==='on',finish:fd.get('show_finish')==='on',dimensions:fd.get('show_dimensions')==='on',customDesign:fd.get('show_customDesign')==='on'},imageUrl,imageUrls};if(id)await api('/owner/products/'+id,{method:'PATCH',body});else await api('/owner/products',{method:'POST',body});toast('Furniture saved.');$('#admin-modal').innerHTML='';await dashboard('furniture');}catch(err){toast(err.message,true);b.disabled=false;}};}
+
   function bindDashboard(tab){if(tab==='furniture'){$('#new-furniture').onclick=()=>productModal();$$('[data-edit-product]').forEach(b=>b.onclick=()=>productModal(products.find(p=>p.id===b.dataset.editProduct)));$$('[data-toggle-product]').forEach(b=>b.onclick=async()=>{const hidden=b.dataset.nextHidden==='true';if(!confirm(hidden?'Hide this furniture from the public website?':'Make this furniture visible to the public?'))return;try{await api('/owner/products/'+b.dataset.toggleProduct,{method:'PATCH',body:{isHidden:hidden}});toast(hidden?'Furniture hidden.':'Furniture is now public.');await dashboard('furniture');}catch(e){toast(e.message,true);}});}
     if(tab==='categories'){$('#category-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{await api('/owner/categories',{method:'POST',body:{name:f.get('name'),nameNe:f.get('nameNe')}});toast('Category added.');await dashboard('categories');}catch(err){toast(err.message,true);}};$$('[data-delete-category]').forEach(b=>b.onclick=async()=>{if(!confirm('Delete this category?'))return;try{await api('/owner/categories/'+b.dataset.deleteCategory,{method:'DELETE'});await dashboard('categories');}catch(e){toast(e.message,true);}});}
     if(tab==='gallery'){$('#gallery-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),b=e.currentTarget.querySelector('button');b.disabled=true;try{const url=await uploadImage(f.get('image'),'settings');await api('/owner/gallery',{method:'POST',body:{title:f.get('title'),description:f.get('description'),imageUrl:url}});toast('Gallery project added.');await dashboard('gallery');}catch(err){toast(err.message,true);b.disabled=false;}};$$('[data-delete-gallery]').forEach(b=>b.onclick=async()=>{if(!confirm('Delete this gallery item?'))return;await api('/owner/gallery/'+b.dataset.deleteGallery,{method:'DELETE'});await dashboard('gallery');});}
     if(tab==='announcements'){$('#notice-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);try{await api('/owner/notices',{method:'POST',body:{title:f.get('title'),body:f.get('body'),isPublished:f.get('isPublished')==='on'}});toast('Announcement published.');await dashboard('announcements');}catch(err){toast(err.message,true);}};$$('[data-delete-notice]').forEach(b=>b.onclick=async()=>{if(!confirm('Delete this announcement?'))return;await api('/owner/notices/'+b.dataset.deleteNotice,{method:'DELETE'});await dashboard('announcements');});}
     if(tab==='settings'){$('#password-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget);if(f.get('newPassword')!==f.get('confirmPassword')){toast('New passwords do not match.',true);return;}try{await api('/owner/change-password',{method:'POST',body:{currentPassword:f.get('currentPassword'),newPassword:f.get('newPassword')}});toast('Password updated. Please sign in again.');localStorage.removeItem(TOKEN);location.href='login.html';}catch(err){toast(err.message,true);}};$('#settings-form').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),b=e.currentTarget.querySelector('button');b.disabled=true;try{for(const key of ['name','suffix','motto','description','millDescription','phone','email','address','bannerImage','aboutImage','millImage','socials']){let value=f.get(key);if(key==='socials')value={facebook:f.get('facebook'),instagram:f.get('instagram')};if(key==='bannerImage'&&$('#banner-file').files[0])value=await uploadImage($('#banner-file').files[0],'settings');if(key==='aboutImage'&&$('#about-file').files[0])value=await uploadImage($('#about-file').files[0],'settings');if(key==='millImage'&&$('#mill-file').files[0])value=await uploadImage($('#mill-file').files[0],'settings');await api('/owner/settings/'+key,{method:'PUT',body:{value}});}toast('Business settings saved.');await loadPublic();await dashboard('settings');}catch(err){toast(err.message,true);}finally{b.disabled=false;}};}
   }
+
   async function start(){document.documentElement.lang=language==='ne'?'ne':'en';if(path.endsWith('/admin/login.html')){loginPage();return;}if(path.endsWith('/admin/dashboard.html')){await dashboard();return;}await loadPublic();if(path.endsWith('/pages/products.html'))return furniturePage();if(path.endsWith('/pages/gallery.html'))return galleryPage();if(path.endsWith('/pages/about.html'))return aboutPage();if(path.endsWith('/pages/mill.html'))return millPage();if(path.endsWith('/pages/announcements.html'))return announcementsPage();home();}
   document.addEventListener('DOMContentLoaded',()=>start().catch(e=>{console.error(e);$('#app').innerHTML=`<main class="g-wrap g-page"><div class="g-empty">${esc(e.message)}<p>Please refresh the page.</p></div></main>`;}));
 })();
+
+  // PART 6 COMPLETE — FILE COMPLETE
+ 
