@@ -31,3 +31,89 @@ html[data-theme="dark"] .g-theme-toggle{color:var(--g-ink)}
 html[data-theme="dark"] .g-admin-layout,html[data-theme="dark"] .g-admin-content,html[data-theme="dark"] .g-admin-top,html[data-theme="dark"] .g-admin-welcome,html[data-theme="dark"] .g-admin-stats article,html[data-theme="dark"] .g-product-card,html[data-theme="dark"] .g-notices article,html[data-theme="dark"] .g-gallery-item{background:#211a15;color:var(--g-ink);border-color:var(--g-line)}
 html[data-theme="dark"] .g-eyebrow,html[data-theme="dark"] .g-card-kicker,html[data-theme="dark"] .g-admin-list small{color:#c6a77d}
 html[data-theme="dark"] .g-empty{background:#211a15;color:var(--g-muted);border-color:var(--g-line)}
+/* Custom Furniture Category Dropdown */
+
+.g-category-dropdown {
+  position: relative;
+  min-width: 210px;
+  width: 230px;
+}
+
+.g-category-trigger {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: #fffdf9;
+  border: 1px solid #dfd1c0;
+  color: #39271b;
+  cursor: pointer;
+  font-size: 13px;
+  text-align: left;
+}
+
+.g-category-arrow {
+  color: #a77b42;
+  font-size: 19px;
+  transition: transform .2s ease;
+}
+
+.g-category-dropdown.open .g-category-arrow {
+  transform: rotate(180deg);
+}
+
+.g-category-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 7px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 7px;
+  background: #fffdf9;
+  border: 1px solid #dfd1c0;
+  box-shadow: 0 12px 30px rgba(48, 30, 17, .15);
+}
+
+.g-category-dropdown.open .g-category-menu {
+  display: block;
+  animation: gDropdownOpen .18s ease;
+}
+
+.g-category-menu button {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 0;
+  background: transparent;
+  color: #493426;
+  text-align: left;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.g-category-menu button:hover {
+  background: #f1e8dc;
+  color: #956b35;
+}
+
+@keyframes gDropdownOpen {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media(max-width:620px) {
+  .g-category-dropdown {
+    width: 100%;
+  }
+}
