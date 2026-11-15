@@ -97,7 +97,37 @@
         ${esc(c.name)}
       </button>
     `).join('')}
-  </div></div><div class="g-product-grid g-product-grid-large" id="catalog-grid">${items.map(productCard).join('')||`<div class="g-empty">${t('No furniture found. Please check back soon.','फर्निचर भेटिएन। कृपया पछि फेरि हेर्नुहोस्।')}</div>`}</div></main>`,'furniture');$('#furniture-search')?.addEventListener('input',e=>{const v=e.target.value.toLowerCase();const selected=$('#furniture-category')?.value||'';const filtered=products.filter(p=>(!selected||(p.category_name||p.category)===selected)&&`${p.name||''} ${p.name_ne||''} ${p.description||''} ${p.description_ne||''} ${p.wood_type||p.woodType||''} ${p.finish||''} ${p.dimensions||''}`.toLowerCase().includes(v));$('#catalog-grid').innerHTML=filtered.map(productCard).join('')||`<div class="g-empty">No matching furniture.</div>`;});$('#furniture-category')?.addEventListener('change',e=>{const u=new URL(location.href);if(e.target.value)u.searchParams.set('category',e.target.value);else u.searchParams.delete('category');const term=$('#furniture-search')?.value||'';if(term)u.searchParams.set('q',term);else u.searchParams.delete('q');location.href=u;});}
+  </div></div><div class="g-product-grid g-product-grid-large" id="catalog-grid">${items.map(productCard).join('')||`<div class="g-empty">${t('No furniture found. Please check back soon.','फर्निचर भेटिएन। कृपया पछि फेरि हेर्नुहोस्।')}</div>`}</div></main>`,'furniture');$('#furniture-search')?.addEventListener('input',e=>{const v=e.target.value.toLowerCase();const selected=$('#furniture-category')?.value||'';const filtered=products.filter(p=>(!selected||(p.category_name||p.category)===selected)&&`${p.name||''} ${p.name_ne||''} ${p.description||''} ${p.description_ne||''} ${p.wood_type||p.woodType||''} ${p.finish||''} ${p.dimensions||''}`.toLowerCase().includes(v));$('#catalog-grid').innerHTML=filtered.map(productCard).join('')||`<div class="g-empty">No matching furniture.</div>`;});const dropdown = $('#category-dropdown');
+const trigger = $('#category-trigger');
+const menu = $('#category-menu');
+
+trigger?.addEventListener('click', () => {
+  const isOpen = dropdown.classList.toggle('open');
+  trigger.setAttribute('aria-expanded', String(isOpen));
+});
+
+menu?.querySelectorAll('button').forEach(button => {
+  button.addEventListener('click', () => {
+    const value = button.dataset.category;
+    const url = new URL(location.href);
+
+    if (value) url.searchParams.set('category', value);
+    else url.searchParams.delete('category');
+
+    const term = $('#furniture-search')?.value || '';
+    if (term) url.searchParams.set('q', term);
+    else url.searchParams.delete('q');
+
+    location.href = url;
+  });
+});
+
+document.addEventListener('click', event => {
+  if (!dropdown?.contains(event.target)) {
+    dropdown?.classList.remove('open');
+    trigger?.setAttribute('aria-expanded', 'false');
+  }
+});{const u=new URL(location.href);if(e.target.value)u.searchParams.set('category',e.target.value);else u.searchParams.delete('category');const term=$('#furniture-search')?.value||'';if(term)u.searchParams.set('q',term);else u.searchParams.delete('q');location.href=u;});}
   function galleryPage(){shell(`<main class="g-wrap g-page">${sectionHead(t('OUR CRAFTSMANSHIP','हाम्रो सीप'),t('Our work gallery','हाम्रा कामहरूको ग्यालरी'),t('A selection of furniture, wood carving and workshop projects.','फर्निचर, काठको नक्काशी र वर्कशपका केही कामहरू।'))}<div class="g-gallery-grid g-gallery-grid-page">${gallery.map(g=>`<article class="g-gallery-item">${image(g.image_url,g.title)}<div><h3>${esc(g.title)}</h3><p>${esc(g.description)}</p></div></article>`).join('')||`<div class="g-empty">${t('Project photographs will be added here.','परियोजनाका तस्बिरहरू यहाँ थपिनेछन्।')}</div>`}</div></main>`,'gallery');}
   function aboutPage(){const intro=settings.description||t('Business introduction will be added by the owner.','व्यवसायको परिचय सञ्चालकले थप्नुहुनेछ।');shell(`<main class="g-wrap g-page"><div class="g-about-layout"><div>${sectionHead(t('ABOUT THE BUSINESS','हाम्रो व्यवसाय'),t('Gangaram Furniture Udhyog','गंगाराम फर्निचर उद्योग'),intro)}<p class="g-long-copy">${esc(intro)}</p></div><div class="g-about-photo">${settings.aboutImage?image(settings.aboutImage,'Business information image'):'<div class="g-image-placeholder"><span>G</span><small>Business image will be added by the owner</small></div>'}</div></div></main>`,'about');}
 
