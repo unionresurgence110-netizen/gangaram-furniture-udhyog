@@ -1,6 +1,6 @@
 /* Gangaram Furniture Udhyog — customer showcase + private owner dashboard */
 (() => {
-  const API = '/api';
+  const API = 'https://gangaram-furniture-udhyog.onrender.com/api';
   const TOKEN = 'gangaram-owner-token';
   const LANG = 'gangaram-language';
   const THEME = 'gangaram-theme';
