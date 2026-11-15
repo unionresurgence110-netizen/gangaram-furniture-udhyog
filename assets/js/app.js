@@ -5,6 +5,7 @@
   const LANG = 'gangaram-language';
   const THEME = 'gangaram-theme';
   const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => r.querySelectorAll(s);
   const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const path = location.pathname;
   const nested = /\/(pages|admin)\//.test(path);
