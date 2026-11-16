@@ -382,6 +382,7 @@ router.get('/owner/products',...owner,wrap(async(req,res)=>{
 
 router.post('/owner/products',...owner,wrap(async(req,res)=>{
  const {name,description='',nameNe='',descriptionNe='',price=null,categoryId,woodType='',finish='',dimensions='',customDesign=false,imageUrl='',imageUrls=[],detailsVisibility={},isHidden=false}=req.body;
+ if(!Array.isArray(imageUrls)||imageUrls.length>3||imageUrls.some(x=>typeof x!=='string'||x.length>2048))return res.status(400).json({error:'A furniture item supports 1 main image plus a maximum of 3 additional image URLs.'});
  const cleanPrice=price===null||price===''||price===undefined?null:Number(price);
  if(!String(name||'').trim()||(cleanPrice!==null&&(!Number.isFinite(cleanPrice)||cleanPrice<0))){
   return res.status(400).json({error:'Check the furniture name and optional price.'});
@@ -394,6 +395,7 @@ router.post('/owner/products',...owner,wrap(async(req,res)=>{
 
 router.patch('/owner/products/:id',...owner,wrap(async(req,res)=>{
  const b=req.body;
+ if(b.imageUrls!==undefined&&(!Array.isArray(b.imageUrls)||b.imageUrls.length>3||b.imageUrls.some(x=>typeof x!=='string'||x.length>2048)))return res.status(400).json({error:'A furniture item supports a maximum of 3 additional image URLs.'});
  const fields={
   name:'name',
   description:'description',
@@ -829,6 +831,13 @@ router.post('/owner/gallery',...owner,wrap(async(req,res)=>{
  const title=String(req.body.title||'').trim(),description=String(req.body.description||'').trim(),imageUrl=String(req.body.imageUrl||'').trim();
  if(!title||!imageUrl)return res.status(400).json({error:'Gallery title and image URL are required.'});
  const r=await query('INSERT INTO gallery_items(title,description,image_url) VALUES($1,$2,$3) RETURNING *',[title,description,imageUrl]);res.status(201).json({item:r.rows[0]});
+}));
+router.patch('/owner/gallery/:id',...owner,wrap(async(req,res)=>{
+ const title=String(req.body.title||'').trim(),description=String(req.body.description||'').trim(),imageUrl=String(req.body.imageUrl||'').trim();
+ if(!title||!imageUrl)return res.status(400).json({error:'Gallery title and image URL are required.'});
+ const r=await query('UPDATE gallery_items SET title=$1,description=$2,image_url=$3 WHERE id=$4 RETURNING *',[title,description,imageUrl,req.params.id]);
+ if(!r.rowCount)return res.status(404).json({error:'Gallery project not found.'});
+ res.json({item:r.rows[0]});
 }));
 router.delete('/owner/gallery/:id',...owner,wrap(async(req,res)=>{await query('DELETE FROM gallery_items WHERE id=$1',[req.params.id]);res.json({deleted:true});}));
 router.get('/owner/notices',...owner,wrap(async(req,res)=>{const r=await query('SELECT * FROM notices ORDER BY created_at DESC');res.json({notices:r.rows});}));
